@@ -9,6 +9,7 @@ using Microsoft.Bot.Connector;
 using Newtonsoft.Json;
 using Microsoft.Bot.Builder.Dialogs;
 using HotelBot.Dialogs;
+using HotelBot.Models;
 
 namespace HotelBot
 {
@@ -24,7 +25,11 @@ namespace HotelBot
             if (activity.Type == ActivityTypes.Message)
             {
                 //await Conversation.SendAsync(activity, () => new GreetingDialog());
-                await Conversation.SendAsync(activity, () =>  HotelBotDialog.dialog);
+                //await Conversation.SendAsync(activity, () =>  HotelBotDialog.dialog);
+                // To use LUIS API
+
+                await Conversation.SendAsync(activity, MakeLuisDialog);
+
             }
             else
             {
@@ -32,6 +37,11 @@ namespace HotelBot
             }
             var response = Request.CreateResponse(HttpStatusCode.OK);
             return response;
+        }
+
+        private IDialog<RoomReservation> MakeLuisDialog()
+        {
+            return Chain.From(() => new HotelBotLuisDialog(RoomReservation.BuildForm));
         }
 
         private Activity HandleSystemMessage(Activity message)
